@@ -2,7 +2,6 @@ package com.filxdev.questapp.responses;
 
 import java.util.List;
 
-import com.filxdev.questapp.entities.Like;
 import com.filxdev.questapp.entities.Post;
 
 import lombok.Data;

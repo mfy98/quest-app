@@ -1,29 +1,41 @@
 package com.filxdev.questapp.services;
 
+import com.filxdev.questapp.entities.Like;
 import com.filxdev.questapp.entities.Post;
 import com.filxdev.questapp.entities.User;
+import com.filxdev.questapp.repos.LikeRepository;
 import com.filxdev.questapp.repos.PostRepository;
 import com.filxdev.questapp.requests.PostCreateRequest;
 import com.filxdev.questapp.requests.PostUpdateRequest;
+import com.filxdev.questapp.responses.LikeResponse;
+import com.filxdev.questapp.responses.PostResponse;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class PostService {
     private PostRepository postRepository;
     private UserService userService;
+    private LikeService likeService;
+
 
     public PostService(PostRepository postRepository, UserService userService){
         this.postRepository = postRepository;
         this.userService = userService;
     }
-    public List<Post> getAllPosts(Optional<Long> userId) {
+    public List<PostResponse> getAllPosts(Optional<Long> userId) {
+        List<Post> list;
+
         if(userId.isPresent()){
-            return postRepository.findByUserId(userId.get());
+            list = postRepository.findByUserId(userId.get());
         }
-        return postRepository.findAll();
+        list = postRepository.findAll();
+        return list.stream().map(p -> {
+            List<LikeResponse> likes = likeService.getAllLikesWithParam(null,Optional.of(p.getId()));
+            return new PostResponse(p,likes);}).collect(Collectors.toList());
 
     }
 
